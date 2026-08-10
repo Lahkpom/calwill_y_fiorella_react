@@ -1,5 +1,6 @@
-import { supabase } from '../config/supabase';
+import { apiRequest } from '../services/api';
 
+// TODO: Ajusta las rutas de estos endpoints cuando tengas definidas las URLs de tu backend Java.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* VIEW V_PRODUCTS_COMPLETE */
@@ -9,26 +10,10 @@ import { supabase } from '../config/supabase';
   * Obtener productos por categoría con valores mínimos solo para hompage
   * @param {string} category - 'children' || 'men' || 'women'
   * @returns {Promise<Array>} Array de productos
- */
+  */
 export const getProductsForHomepage = async (id_category) => {
     try {
-        const { data, error } = await supabase
-        .from('v_products_complete')
-        .select(`
-            id_product,
-            product_name,
-            short_desc,
-            min_price,
-            cat_name,
-            size_count,
-            color_count,
-            main_image_url`)
-        .eq('status', 'A')
-        .eq('id_category', id_category)
-        .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        return data;
+        return await apiRequest(`/products/homepage?category=${encodeURIComponent(id_category)}`);
     } catch (error) {
         console.error('Error fetching products by category:', error);
         throw error;
@@ -90,14 +75,7 @@ export const getProductsForHomepage = async (id_category) => {
  */
 export const getProductDetail = async (productId) => {
     try {
-        const { data, error } = await supabase
-            .from('v_product_detail')
-            .select('*')
-            .eq('id_product', productId)
-            .single();
-
-        if (error) throw error;
-        return data;
+        return await apiRequest(`/products/${encodeURIComponent(productId)}`);
     } catch (error) {
         console.error('Error fetching product detail:', error);
         throw error;
@@ -112,14 +90,7 @@ export const getProductDetail = async (productId) => {
  */
 export const getSizesByProduct = async (productId) => {
     try {
-        const { data, error } = await supabase
-            .from('v_variants_by_size')
-            .select('*')
-            .eq('id_product', productId)
-            .order('sort_order', { ascending: true });
-
-        if (error) throw error;
-        return data || [];
+        return await apiRequest(`/products/${encodeURIComponent(productId)}/sizes`);
     } catch (error) {
         console.error('Error fetching sizes by product:', error);
         throw error;
@@ -135,27 +106,7 @@ export const getSizesByProduct = async (productId) => {
  */
 export const getColorsByProductAndSize = async (productId, sizeId) => {
     try {
-        const { data, error } = await supabase
-            .from('product_variants')
-            .select(`
-                id_variant,
-                sku,
-                price,
-                stock,
-                colors (
-                    id_color,
-                    name,
-                    description,
-                    hex_code
-                )
-            `)
-            .eq('id_product', productId)
-            .eq('id_size', sizeId)
-            .eq('cod_status', 'A')
-            .order('id_color', { ascending: true });
-
-        if (error) throw error;
-        return data || [];
+        return await apiRequest(`/products/${encodeURIComponent(productId)}/sizes/${encodeURIComponent(sizeId)}/colors`);
     } catch (error) {
         console.error('Error fetching colors by product and size:', error);
         throw error;
@@ -169,14 +120,7 @@ export const getColorsByProductAndSize = async (productId, sizeId) => {
  */
 export const getVariantImages = async (variantId) => {
     try {
-        const { data, error } = await supabase
-            .from('v_variant_images')
-            .select('id_image, image_url, order_position')
-            .eq('id_variant', variantId)
-            .order('order_position', { ascending: true });
-
-        if (error) throw error;
-        return data || [];
+        return await apiRequest(`/variants/${encodeURIComponent(variantId)}/images`);
     } catch (error) {
         console.error('Error fetching variant images:', error);
         throw error;
@@ -204,34 +148,7 @@ export const getVariantImages = async (variantId) => {
  */
 export const getProductById = async (productId) => {
     try {
-        // Obtener producto
-        const { data: product, error: productError } = await supabase
-        .from('products')
-        .select(`
-            *,
-            categories (description),
-            status (description)
-        `)
-        .eq('id_product', productId)
-        .single();
-
-        if (productError) throw productError;
-
-        // // Obtener imágenes del producto
-        // const { data: images, error: imagesError } = await supabase
-        // .from('product_images')
-        // .select('*')
-        // .eq('id_product', productId)
-        // .eq('id_status', 1) // Solo imágenes activas
-        // .order('order_position', { ascending: true })
-
-        // if (imagesError) throw imagesError
-
-        return product;
-        // {
-        // ...product,
-        // // images
-        // }
+        return await apiRequest(`/products/${encodeURIComponent(productId)}?include=images`);
     } catch (error) {
         console.error('Error fetching product:', error);
         throw error;
@@ -244,17 +161,7 @@ export const getProductById = async (productId) => {
  */
 export const getActiveCategories = async () => {
     try {
-        const { data, error } = await supabase
-        .from('categories')
-        .select(`
-            id_category,
-            name,
-            description`)
-        .eq('cod_status', 'A')
-        .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        return data;
+        return await apiRequest('/categories?status=active');
     } catch (error) {
         console.error('Error fetching active categories:', error);
         throw error;

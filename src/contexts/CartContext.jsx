@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { AuthContext } from './AuthContext.jsx';
+import { AuthContext } from './AuthContext.tsx';
 import * as cartService from '../services/cartService';
 
 const CartContext = createContext();
@@ -12,7 +12,7 @@ const CartProvider = ({ children }) => {
     // Capa 1: datos mínimos persistidos — [{ id_variant, quantity }, ...]
     const [cartKeys, setCartKeys] = useState([]);
 
-    // Capa 2: datos hidratados desde Supabase — array de ítems enriquecidos
+    // Capa 2: datos hidratados desde backend — array de ítems enriquecidos
     const [cartItems, setCartItems] = useState([]);
 
     const [loading, setLoading] = useState(false);
@@ -23,11 +23,11 @@ const CartProvider = ({ children }) => {
 
         try {
             if (user) {
-                // Usuario logueado: ignorar localStorage, cargar desde Supabase
+                // Usuario logueado: ignorar localStorage, cargar desde el backend REST
                 const items = await cartService.getCartByUser(user.id);
                 if (items !== null) {
                     setCartItems(items);
-                    // Sincronizar cartKeys con los datos de Supabase
+                    // Sincronizar cartKeys con los datos del backend
                     setCartKeys(items.map(i => ({ id_variant: i.id_variant, quantity: i.quantity })));
                 }
             } else {

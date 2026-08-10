@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import './Login.scss';
@@ -10,33 +10,33 @@ const Login = () => {
     const [email    , setEmail]     = useState('');
     const [password , setPassword]  = useState('');
     const [loading  , setLoading]   = useState(false);
-    const [error    , setError]     = useState(null);
+    const [error    , setError]     = useState('');
 
     const [showPassword, setShowPassword] = useState(false);
 
-    // Si hay usuario pero NO estamos en proceso de login (viene de sesión activa)
-    if (user && !redirecting) navigate('/mi_cuenta');
+    useEffect(() => {
+        if (user) navigate('/mi_cuenta');
+    }, [user, navigate]);
 
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
+        setError('');
 
         const { data, error: signInError } = await signIn(email, password);
 
         if (signInError) {
-            setError(signInError.message);
+            setError(signInError.message || 'Credenciales incorrectas');
             setLoading(false);
             return;
         }
 
-        // Redirigir después de login exitoso
         navigate('/productos');
     };
 
     const handleGoogleLogin = async () => {
         setLoading(true);
-        setError(null);
+        setError('');
 
         const { error: googleError } = await signInWithGoogle();
 

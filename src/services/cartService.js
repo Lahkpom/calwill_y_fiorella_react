@@ -1,5 +1,6 @@
-import { supabase } from '../config/supabase';
+import { apiRequest } from '../services/api';
 
+// TODO: Ajusta las rutas de estos endpoints a tu API REST cuando el backend esté listo.
 // ── Funciones para usuarios logueados ────────────────────────────────────────
 
 /**
@@ -9,13 +10,7 @@ import { supabase } from '../config/supabase';
  */
 export const getCartByUser = async (userId) => {
     try {
-        const { data, error } = await supabase
-            .from('v_cart_complete')
-            .select('*')
-            .eq('id_user', userId);
-
-        if (error) throw error;
-        return data || [];
+        return await apiRequest(`/users/${encodeURIComponent(userId)}/cart`);
     } catch (error) {
         console.error('Error fetching cart by user:', error);
         return null;
@@ -32,17 +27,10 @@ export const getCartByUser = async (userId) => {
  */
 export const upsertCartItem = async (userId, id_variant, quantity) => {
     try {
-        const { data, error } = await supabase
-            .from('cart')
-            .upsert(
-                { id_user: userId, id_variant, quantity },
-                { onConflict: 'id_user,id_variant' }
-            )
-            .select()
-            .single();
-
-        if (error) throw error;
-        return data;
+        return await apiRequest(`/users/${encodeURIComponent(userId)}/cart`, {
+            method: 'POST',
+            body: { id_variant, quantity },
+        });
     } catch (error) {
         console.error('Error upserting cart item:', error);
         return null;
@@ -58,13 +46,10 @@ export const upsertCartItem = async (userId, id_variant, quantity) => {
  */
 export const updateCartItemQuantity = async (userId, id_variant, newQuantity) => {
     try {
-        const { error } = await supabase
-            .from('cart')
-            .update({ quantity: newQuantity, updated_at: new Date().toISOString() })
-            .eq('id_user', userId)
-            .eq('id_variant', id_variant);
-
-        if (error) throw error;
+        return await apiRequest(`/users/${encodeURIComponent(userId)}/cart/${encodeURIComponent(id_variant)}`, {
+            method: 'PATCH',
+            body: { quantity: newQuantity },
+        });
     } catch (error) {
         console.error('Error updating cart item quantity:', error);
         return null;
@@ -79,13 +64,9 @@ export const updateCartItemQuantity = async (userId, id_variant, newQuantity) =>
  */
 export const removeCartItem = async (userId, id_variant) => {
     try {
-        const { error } = await supabase
-            .from('cart')
-            .delete()
-            .eq('id_user', userId)
-            .eq('id_variant', id_variant);
-
-        if (error) throw error;
+        return await apiRequest(`/users/${encodeURIComponent(userId)}/cart/${encodeURIComponent(id_variant)}`, {
+            method: 'DELETE',
+        });
     } catch (error) {
         console.error('Error removing cart item:', error);
         return null;
@@ -99,12 +80,9 @@ export const removeCartItem = async (userId, id_variant) => {
  */
 export const clearUserCart = async (userId) => {
     try {
-        const { error } = await supabase
-            .from('cart')
-            .delete()
-            .eq('id_user', userId);
-
-        if (error) throw error;
+        return await apiRequest(`/users/${encodeURIComponent(userId)}/cart`, {
+            method: 'DELETE',
+        });
     } catch (error) {
         console.error('Error clearing user cart:', error);
         return null;
@@ -121,13 +99,10 @@ export const clearUserCart = async (userId) => {
  */
 export const getVariantsByIds = async (variantIds) => {
     try {
-        const { data, error } = await supabase
-            .from('v_variant_public')
-            .select('*')
-            .in('id_variant', variantIds);
-
-        if (error) throw error;
-        return data || [];
+        return await apiRequest('/variants/bulk', {
+            method: 'POST',
+            body: { ids: variantIds },
+        });
     } catch (error) {
         console.error('Error fetching variants by ids:', error);
         return null;
