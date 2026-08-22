@@ -14,7 +14,7 @@ import Signup from "../pages/login/Signup.jsx";
 import Error404 from '../pages/errors/Error404.jsx';
 import ProtectedRoute from '../components/ProtectedRoute';
 // import AdminHome            from "../pages/admin/AdminHome.jsx";
-import AdminPanel from "../pages/AdminPanel.jsx";
+import AdminHome from "../pages/admin/AdminHome.jsx";
 
 // import Cart                 from "../pages/user/Cart.jsx";
 import Cart from "../pages/user/Cart.jsx";
@@ -69,7 +69,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "admin",
-                element: <ProtectedRoute roles={["admin", "superadmin"]}><AdminPanel /></ProtectedRoute>
+                element: <ProtectedRoute roles={["admin", "superadmin"]}><AdminHome /></ProtectedRoute>
             },
         ]
     }

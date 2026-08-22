@@ -2,7 +2,7 @@ const BASE_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 export const AUTH_TOKEN_KEY = 'calwill_fiorella_access_token';
 const LOGIN_ROUTE = '/iniciar_sesion';
 
-const getStoredToken = (): string | null => {
+export const getStoredToken = (): string | null => {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem(AUTH_TOKEN_KEY);
 };
