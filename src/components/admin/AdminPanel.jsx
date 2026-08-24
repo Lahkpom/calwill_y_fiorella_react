@@ -43,64 +43,44 @@ const AdminPanel = () => {
                         {activeSection === 'products' ? <AdminProducts /> : (
                             <>
                                 <div className="card mb-4">
-                                    <div className="card-header"><h5>Información del Usuario</h5></div>
+                                    <div className="card-header">
+                                        <h5>Información del Usuario</h5>
+                                    </div>
                                     <div className="card-body">
                                         <p><strong>Email:</strong> {user?.email}</p>
                                         <p><strong>Nombre:</strong> {profile?.full_name}</p>
                                         <p><strong>Rol:</strong> <span className="badge bg-primary">{role}</span></p>
                                         <p><strong>Teléfono:</strong> {profile?.phone || 'No especificado'}</p>
-                                        {profile?.company_name && <p><strong>Empresa:</strong> {profile.company_name}</p>}
+                                        {profile?.company_name && (
+                                            <p><strong>Empresa:</strong> {profile.company_name}</p>
+                                        )}
                                     </div>
                                 </div>
+
                                 <div className="alert alert-info">
                                     <h5>Acciones disponibles según tu rol:</h5>
                                     <ul>
-                                        {role === 'superadmin' && <><li>Crear y gestionar admins</li><li>Crear usuarios mayoristas</li><li>Gestionar productos y stock</li><li>Ver todas las ventas</li><li>Acceso total al sistema</li></>}
-                                        {role === 'admin' && <><li>Crear usuarios mayoristas</li><li>Gestionar productos y stock</li><li>Ver todas las ventas</li><li>No puede crear otros admins</li></>}
+                                        {role === 'superadmin' && (
+                                            <>
+                                                <li>✅ Crear y gestionar admins</li>
+                                                <li>✅ Crear usuarios mayoristas</li>
+                                                <li>✅ Gestionar productos y stock</li>
+                                                <li>✅ Ver todas las ventas</li>
+                                                <li>✅ Acceso total al sistema</li>
+                                            </>
+                                        )}
+                                        {role === 'admin' && (
+                                            <>
+                                                <li>✅ Crear usuarios mayoristas</li>
+                                                <li>✅ Gestionar productos y stock</li>
+                                                <li>✅ Ver todas las ventas</li>
+                                                <li>❌ No puede crear otros admins</li>
+                                            </>
+                                        )}
                                     </ul>
                                 </div>
                             </>
                         )}
-
-                        {/* 
-                        ESTE ES EL CONTENIDO QUE DEBE MOSTRARSE POR DEFECTO CUANDO AÚN NO HA SIDO PRESIONADO NINGÚN BOTÓN
-                        <div className="card mb-4">
-                            <div className="card-header">
-                                <h5>Información del Usuario</h5>
-                            </div>
-                            <div className="card-body">
-                                <p><strong>Email:</strong> {user?.email}</p>
-                                <p><strong>Nombre:</strong> {profile?.full_name}</p>
-                                <p><strong>Rol:</strong> <span className="badge bg-primary">{role}</span></p>
-                                <p><strong>Teléfono:</strong> {profile?.phone || 'No especificado'}</p>
-                                {profile?.company_name && (
-                                    <p><strong>Empresa:</strong> {profile.company_name}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="alert alert-info">
-                            <h5>Acciones disponibles según tu rol:</h5>
-                            <ul>
-                                {role === 'superadmin' && (
-                                    <>
-                                        <li>✅ Crear y gestionar admins</li>
-                                        <li>✅ Crear usuarios mayoristas</li>
-                                        <li>✅ Gestionar productos y stock</li>
-                                        <li>✅ Ver todas las ventas</li>
-                                        <li>✅ Acceso total al sistema</li>
-                                    </>
-                                )}
-                                {role === 'admin' && (
-                                    <>
-                                        <li>✅ Crear usuarios mayoristas</li>
-                                        <li>✅ Gestionar productos y stock</li>
-                                        <li>✅ Ver todas las ventas</li>
-                                        <li>❌ No puede crear otros admins</li>
-                                    </>
-                                )}
-                            </ul>
-                        </div> */}
                     </div>
                 </div>
             </div>
