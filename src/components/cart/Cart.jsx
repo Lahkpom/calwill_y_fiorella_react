@@ -91,7 +91,7 @@ const Cart = () => {
                                         {/* Eliminar ítem */}
                                         <button
                                             className="cart-item__remove"
-                                            aria-label={`Eliminar ${item.product_name} del carrito`}
+                                            aria-label={`Eliminar ${item.product_name} (Variante ${item.id_variant}) del carrito`}
                                             onClick={() => removeItem(item.id_variant)}
                                             title="Eliminar del carrito"
                                         >
