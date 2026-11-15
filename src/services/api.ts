@@ -1,6 +1,18 @@
+import axios, { type AxiosRequestConfig } from 'axios';
+
 const BASE_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 export const AUTH_TOKEN_KEY = 'calwill_fiorella_access_token';
 const LOGIN_ROUTE = '/iniciar_sesion';
+
+type ApiRequestOptions = Omit<AxiosRequestConfig, 'baseURL' | 'data' | 'url'> & {
+  body?: unknown;
+  credentials?: RequestCredentials;
+};
+
+const apiClient = axios.create({
+  baseURL: BASE_API_URL,
+  withCredentials: true,
+});
 
 export const getStoredToken = (): string | null => {
   if (typeof window === 'undefined') return null;
@@ -13,22 +25,6 @@ export const setStoredToken = (token: string | null): void => {
   else localStorage.removeItem(AUTH_TOKEN_KEY);
 };
 
-const buildUrl = (path: string): string => {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  return `${BASE_API_URL}${normalizedPath}`;
-};
-
-const parseJsonResponse = async (response: Response): Promise<unknown> => {
-  const text = await response.text();
-  if (!text) return null;
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
-};
-
 const handleUnauthorized = (): void => {
   setStoredToken(null);
   if (typeof window !== 'undefined') {
@@ -36,39 +32,70 @@ const handleUnauthorized = (): void => {
   }
 };
 
-export const apiRequest = async <T = unknown>(path: string, options: RequestInit = {}): Promise<T> => {
+apiClient.interceptors.request.use((config) => {
   const token = getStoredToken();
-  const headers = new Headers(options.headers ?? {});
-
-  if (options.body && typeof options.body !== 'string') {
-    headers.set('Content-Type', 'application/json');
-  }
 
   if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
+    config.headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(buildUrl(path), {
-    credentials: 'include',
-    ...options,
-    headers,
-    body: options.body && typeof options.body !== 'string' ? JSON.stringify(options.body) : options.body,
-  });
+  return config;
+});
 
-  const data = await parseJsonResponse(response);
-
-  if (response.status === 401) {
+apiClient.interceptors.response.use(undefined, (error: unknown) => {
+  if (axios.isAxiosError(error) && error.response?.status === 401) {
     handleUnauthorized();
-    const message = typeof data === 'object' && data !== null ? (data as any).message ?? (data as any).error : String(data);
-    throw new Error(message || 'Sesión expirada. Iniciá sesión de nuevo.');
   }
 
-  if (!response.ok) {
-    const message = typeof data === 'object' && data !== null ? (data as any).message ?? (data as any).error : String(data);
-    throw new Error(message || response.statusText || 'Error en la petición de la API');
+  return Promise.reject(error);
+});
+
+const getErrorMessage = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const responseData: unknown = error.response?.data;
+
+    if (typeof responseData === 'string' && responseData.trim()) {
+      return responseData;
+    }
+
+    if (typeof responseData === 'object' && responseData !== null) {
+      const errorResponse = responseData as { message?: unknown; error?: unknown };
+      if (typeof errorResponse.message === 'string' && errorResponse.message.trim()) {
+        return errorResponse.message;
+      }
+      if (typeof errorResponse.error === 'string' && errorResponse.error.trim()) {
+        return errorResponse.error;
+      }
+    }
+
+    if (error.response?.status === 401) {
+      return 'Sesión expirada. Iniciá sesión de nuevo.';
+    }
+
+    return error.message || 'Error en la petición de la API';
   }
 
-  return data as T;
+  return error instanceof Error ? error.message : 'Error en la petición de la API';
+};
+
+export const apiRequest = async <T = unknown>(
+  path: string,
+  options: ApiRequestOptions = {},
+): Promise<T> => {
+  const { body, credentials, ...requestOptions } = options;
+
+  try {
+    const response = await apiClient.request<T>({
+      ...requestOptions,
+      url: path.startsWith('/') ? path : `/${path}`,
+      data: body,
+      withCredentials: credentials !== 'omit',
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 };
 
 export default {
