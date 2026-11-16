@@ -4,7 +4,7 @@ import Layout from '../components/layout/Layout.jsx';
 
 import Home from '../pages/Home.jsx';
 import ProductsContainer from '../pages/ProductsContainer.jsx';
-import ProductDetails from '../pages/ProductDetails.jsx';
+import ProductDetails from '../pages/ProductDetails.tsx';
 import ContactContainer from '../pages/ContactContainer.jsx';
 import Payment_Shipping from '../pages/Payment_Shipping.jsx';
 

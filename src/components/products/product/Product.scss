@@ -4,3 +4,101 @@
     background: $secondary-bg-color;
     margin-top: 75px;
 }
+
+.product__selector {
+    margin-block: 1.25rem;
+}
+
+.product__selector-label {
+    margin-bottom: 0.25rem;
+}
+
+.size-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.product__size-option {
+    min-width: 2.5rem;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid $btn-primary-color;
+    border-radius: 999px;
+    background-color: $btn-secondary-color;
+    color: $btn-primary-color;
+    font: inherit;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover,
+    &:focus-visible,
+    &.active {
+        background-color: $btn-primary-color;
+        color: $btn-secondary-color;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $black-color;
+        outline-offset: 2px;
+    }
+}
+
+.product__add-to-cart--unavailable,
+.product__add-to-cart--unavailable:hover,
+.product__add-to-cart--unavailable:disabled {
+    border-color: $light-grey-color !important;
+    background-color: $light-grey-color !important;
+    color: $white-color !important;
+    cursor: not-allowed;
+    opacity: 0.8;
+    transform: none;
+}
+
+.product__color-swatch {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin: 0.4rem;
+    border: 2px solid rgba($black-color, 0.2);
+    border-radius: 0.75rem;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible,
+    &.active {
+        outline: 2px solid $black-color;
+        outline-offset: 2px;
+    }
+
+    &.out-of-stock {
+        background-image: linear-gradient(
+            135deg,
+            transparent 47%,
+            rgba($black-color, 0.55) 48%,
+            rgba($black-color, 0.55) 52%,
+            transparent 53%
+        );
+    }
+}
+
+.product__availability {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid rgba($black-color, 0.15);
+    border-radius: 0.5rem;
+}
+
+.product__feedback {
+    margin-top: 0.5rem;
+    color: $charcoal-grey-color;
+
+    &--error {
+        color: $red-color;
+    }
+}
+
+.product__price-section .stock.out {
+    color: $red-color;
+}

@@ -1,13 +1,39 @@
-.carousel-item{
-    width       : 100%;
-    max-height  : 500px;
-
-    img {
-        width       : 100%;     /* Ocupa el 100% del ancho disponible */
-        height      : auto;     /* Mantiene la proporción de la imagen */
-        object-fit  : contain;  /* Asegura que toda la imagen sea visible sin recortar */
-        max-height  : 500px;    /* Limita la altura máxima */
-        overflow    : hidden;
-    }
+.product-gallery {
+    width: 100%;
 }
 
+.product-gallery__frame {
+    display: flex;
+    width: 100%;
+    min-height: 18rem;
+    max-height: 31.25rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-gallery__image {
+    display: block;
+    width: 100%;
+    max-height: 31.25rem;
+    object-fit: contain;
+}
+
+.product-gallery__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+.product-gallery__control {
+    display: inline-flex;
+    width: 2.25rem;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+    font-size: 1.5rem;
+}
