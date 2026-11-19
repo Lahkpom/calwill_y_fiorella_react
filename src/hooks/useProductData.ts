@@ -134,7 +134,7 @@ const useProductData = (productId: string | undefined) => {
     setAddingToCart(true);
     setCartError(null);
     try {
-      await addToCart(String(selectedVariant.variantId), quantity);
+      await addToCart(selectedVariant.variantId, quantity);
     } catch (requestError) {
       const message = requestError instanceof Error
         ? requestError.message

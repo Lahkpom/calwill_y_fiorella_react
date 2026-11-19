@@ -9,18 +9,8 @@ import type { GeoRefOption } from '../../services/georefService';
 import { getShippingQuote } from '../../services/shippingService';
 import type { CheckoutItemRequest, CheckoutRequest, PaymentMethod, SaleResponse } from '../../types/sale';
 import type { ShippingQuoteResponse } from '../../types/shipping';
+import type { CartItemResponse } from '../../types/cart';
 import './CheckoutForm.scss';
-
-interface CheckoutCartItem {
-  id_variant: string | number;
-  product_name: string;
-  color_description?: string;
-  size?: string;
-  quantity: number;
-  price: number;
-  subtotal: number;
-  has_stock?: boolean;
-}
 
 interface ProfileValues {
   full_name?: string;
@@ -45,9 +35,9 @@ const getErrorMessage = (error: unknown): string =>
 
 const CheckoutForm = () => {
   const navigate = useNavigate();
-  const { cartItems, loading: cartLoading, clearCart } = useCart();
+  const { cartItems, grandTotal, loading: cartLoading, clearCart } = useCart();
   const { user, profile } = useAuth();
-  const items = cartItems as CheckoutCartItem[];
+  const items: CartItemResponse[] = cartItems;
   const profileValues = profile as ProfileValues | null;
 
   const [customerName, setCustomerName] = useState(profileValues?.full_name ?? user?.nombre ?? '');
@@ -77,11 +67,9 @@ const CheckoutForm = () => {
     () => localidades.find((locality) => locality.id === localityId)?.nombre ?? '',
     [localidades, localityId],
   );
-  const productsSubtotal = useMemo(
-    () => items.filter((item) => item.has_stock !== false).reduce((total, item) => total + item.subtotal, 0),
-    [items],
-  );
-  const allItemsAvailable = items.length > 0 && items.every((item) => item.has_stock !== false);
+  const productsSubtotal = grandTotal;
+  const allItemsAvailable = items.length > 0
+    && items.every((item) => item.quantity <= item.currentAvailableStock);
   const shippingCost = isPickup ? 0 : quote?.shippingCost ?? 0;
 
   useEffect(() => {
@@ -186,7 +174,7 @@ const CheckoutForm = () => {
     try {
       setSubmitting(true);
       const checkoutItems: CheckoutItemRequest[] = items.map((item) => {
-        const variantId = Number(item.id_variant);
+        const variantId = item.variantId;
         if (!Number.isSafeInteger(variantId) || variantId <= 0) {
           throw new Error('El carrito contiene una variante con identificador inválido.');
         }
@@ -382,8 +370,8 @@ const CheckoutForm = () => {
         <aside className="checkout-summary">
           <h2>Resumen del pedido</h2>
           {items.map((item) => (
-            <div className="checkout-summary__item" key={item.id_variant}>
-              <span>{item.product_name} {item.color_description ? `· ${item.color_description}` : ''} × {item.quantity}</span>
+            <div className="checkout-summary__item" key={item.variantId}>
+              <span>{item.productTitle} {item.attributesDescription ? `· ${item.attributesDescription}` : ''} × {item.quantity}</span>
               <strong>{formatCurrency(item.subtotal)}</strong>
             </div>
           ))}

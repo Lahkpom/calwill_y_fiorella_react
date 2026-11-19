@@ -1,6 +1,6 @@
 import useAuth from '../../hooks/useAuth.js';
 import useMainData from '../../hooks/useMainData.js';
-import useCart from '../../hooks/useCart.js';
+import useCart from '../../hooks/useCart';
 import { 
     Link, 
     useNavigate
@@ -19,7 +19,7 @@ const LINKS = [
 
 const Menu = () => {
     const { user, profile, role, isAdmin, signOut } = useAuth();
-    const { cartItems } = useCart();
+    const { totalUnits } = useCart();
     const { globalInfo } = useMainData();
 
     const navigate = useNavigate();
@@ -56,7 +56,7 @@ const Menu = () => {
                         { LINKS.map(({ name, path }) => (<MenuNavLink key={name} name={name} path={path} collapseMenu={collapseMenu} />)) }
                         { !user && (<MenuNavLink name='Iniciar Sesión' path='/iniciar_sesion' collapseMenu={collapseMenu} />) }
                         <MenuNavLink 
-                            name={<span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{cartItems.length}</span>}
+                            name={<span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{totalUnits}</span>}
                             path='/carrito' 
                             collapseMenu={collapseMenu} 
                             icon={<i className="bi bi-cart3 fs-5"></i>} 
