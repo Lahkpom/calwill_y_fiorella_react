@@ -18,6 +18,7 @@ import AdminHome from "../pages/admin/AdminHome.jsx";
 
 // import Cart                 from "../pages/user/Cart.jsx";
 import Cart from "../pages/user/Cart.jsx";
+import Checkout from '../pages/Checkout.tsx';
 import MyAccountPage from "../pages/user/MyAccount.jsx";
 import MyOrdersPage from "../pages/user/MyOrdersPage.jsx";
 
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
             {
                 path: "carrito",
                 element: <ProtectedRoute><Cart /></ProtectedRoute>
+            },
+            {
+                path: "checkout",
+                element: <ProtectedRoute><Checkout /></ProtectedRoute>
             },
             {
                 path: "mi_cuenta",

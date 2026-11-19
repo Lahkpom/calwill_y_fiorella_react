@@ -3,8 +3,10 @@ import './Cart.scss';
 import { formatCurrency } from '../../utils/helpers';
 import EmptyCart from './EmptyCart';
 import Loader from '../loader/Loader';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
+    const navigate = useNavigate();
     const { cartItems, loading, updateQuantity, removeItem, clearCart } = useCart();
 
     // ── Estado de carga ────────────────────────────────────────────────────
@@ -125,10 +127,10 @@ const Cart = () => {
                                 </span>
                             </div>
 
-                            {/* TODO: integrar con Mercado Pago */}
                             <button
                                 className="btn-checkout"
-                                onClick={() => {}}
+                                disabled={cartItems.some(item => item.has_stock === false)}
+                                onClick={() => navigate('/checkout')}
                             >
                                 Iniciar compra
                             </button>
