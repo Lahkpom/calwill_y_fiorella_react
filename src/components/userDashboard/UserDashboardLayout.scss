@@ -1,0 +1,49 @@
+.user-dashboard {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__content {
+    display: grid;
+    grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  &__sidebar {
+    display: block;
+  }
+
+  &__mobile-nav {
+    display: none;
+  }
+
+  &__main {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .user-dashboard {
+    &__content {
+      display: block;
+    }
+
+    &__sidebar {
+      display: none;
+    }
+
+    &__mobile-nav {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.25rem;
+      overflow-x: auto;
+
+      .nav-link {
+        flex: 0 0 auto;
+      }
+    }
+  }
+}

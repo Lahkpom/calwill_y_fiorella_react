@@ -110,10 +110,17 @@ const Menu = () => {
                     className="dropdown-item"
                   />
                   <MenuNavLink
-                    name="Mis Pedidos"
-                    path="/mis_pedidos"
+                    name="Órdenes Activas"
+                    path="/mi_cuenta/ordenes_activas"
                     collapseMenu={collapseMenu}
                     icon={<i className="bi bi-bag me-2" />}
+                    className="dropdown-item"
+                  />
+                  <MenuNavLink
+                    name="Historial de Compras"
+                    path="/mi_cuenta/historial"
+                    collapseMenu={collapseMenu}
+                    icon={<i className="bi bi-clock-history me-2" />}
                     className="dropdown-item"
                   />
                   <li><hr /></li>

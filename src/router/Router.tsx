@@ -17,8 +17,9 @@ import AdminHome from '../pages/admin/AdminHome.jsx';
 
 import Cart from '../pages/user/Cart';
 import Checkout from '../pages/Checkout';
-import MyAccountPage from '../pages/user/MyAccount.jsx';
-import MyOrdersPage from '../pages/user/MyOrdersPage.jsx';
+import MyAccountPage from '../pages/user/MyAccountPage';
+import MyOrders from '../components/userDashboard/MyOrders';
+import UserDashboardLayout from '../components/userDashboard/UserDashboardLayout';
 
 const router = createBrowserRouter([
   {
@@ -64,11 +65,21 @@ const router = createBrowserRouter([
       },
       {
         path: 'mi_cuenta',
-        element: <ProtectedRoute><MyAccountPage /></ProtectedRoute>,
-      },
-      {
-        path: 'mis_pedidos',
-        element: <ProtectedRoute><MyOrdersPage /></ProtectedRoute>,
+        element: <ProtectedRoute><UserDashboardLayout /></ProtectedRoute>,
+        children: [
+          {
+            index: true,
+            element: <MyAccountPage />,
+          },
+          {
+            path: 'ordenes_activas',
+            element: <MyOrders mode="active" />,
+          },
+          {
+            path: 'historial',
+            element: <MyOrders mode="history" />,
+          },
+        ],
       },
       {
         path: 'admin',
