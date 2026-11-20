@@ -89,3 +89,34 @@ export interface SaleResponse {
   updatedAt: string | null;
   items: SaleItemResponse[];
 }
+
+export interface SaleSummaryResponse {
+  saleId: string;
+  userId: string | null;
+  trackingToken: string;
+  customerName: string;
+  customerEmail: string;
+  customerTaxIdType: string | null;
+  customerTaxIdNumber: string | null;
+  shippingMethod: ShippingMethod;
+  shippingProvince: string | null;
+  shippingLocality: string | null;
+  shippingPostalCode: string | null;
+  saleQuantity: number;
+  saleTotal: number;
+  saleStatus: SaleStatus;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  saleDeliveredAt: string | null;
+  createdAt: string;
+}
+
+export interface SpringPage<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
