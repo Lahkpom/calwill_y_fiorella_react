@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import useMainData from './useMainData.js';
 
-import useAuth from './useAuth.js';
+import useAuth from './useAuth';
 import useSubmitMail from './useSubmitMail.js';
 
 const _INITIAL_SUBMIT_STATUS_STATE = {
@@ -30,8 +30,8 @@ const _VALIDATION_RESULT = {
 };
 
 const _getFormData = (profile = null) => ({
-    name        : profile?.full_name?.toUpperCase() || '',
-    phone_number: profile?.phone                    || '',
+    name        : profile?.userName?.toUpperCase() || '',
+    phone_number: profile?.userPhone              || '',
     message     : ''
 });
 

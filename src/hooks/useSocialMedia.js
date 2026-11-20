@@ -17,7 +17,7 @@ const useSocialMedia = (globalInfo) => {
             name: 'whatsapp',
             icon: 'bi bi-whatsapp',
             color: 'success',
-            url: `https://wa.me/${globalInfo.phoneNumber.replace(/\D/g, '')}?text=Hola,%20mi%20nombre%20es%20${encodeURIComponent(profile?.full_name || 'NOMBRE_AQUI')}.%20Quería%20consultar%20por%20${encodeURIComponent('MENSAJE_AQUI')}`
+            url: `https://wa.me/${globalInfo.phoneNumber.replace(/\D/g, '')}?text=Hola,%20mi%20nombre%20es%20${encodeURIComponent(profile?.userName || 'NOMBRE_AQUI')}.%20Quería%20consultar%20por%20${encodeURIComponent('MENSAJE_AQUI')}`
         }
     ], [profile, globalInfo]);
 

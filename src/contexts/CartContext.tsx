@@ -172,7 +172,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       if (user) {
         const response = await cartService.addCartItem({ variantId, quantity });
-        if (userRef.current?.id === user.id) {
+        if (userRef.current?.userId === user.userId) {
           applyCartResponse(response);
           setSyncNotice(null);
         }
@@ -206,7 +206,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       if (user) {
         const response = await cartService.updateCartItemQuantity(variantId, { quantity: newQuantity });
-        if (userRef.current?.id === user.id) {
+        if (userRef.current?.userId === user.userId) {
           applyCartResponse(response);
           setSyncNotice(null);
         }
@@ -228,7 +228,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       if (user) {
         await cartService.removeCartItem(variantId);
-        if (userRef.current?.id === user.id) {
+        if (userRef.current?.userId === user.userId) {
           const remainingItems = cartItems.filter((item) => item.variantId !== variantId);
           setCartItems(remainingItems);
           setTotalUnits(remainingItems.reduce((total, item) => total + item.quantity, 0));
@@ -251,7 +251,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       if (user) {
         await cartService.clearMyCart();
-        if (userRef.current?.id === user.id) {
+        if (userRef.current?.userId === user.userId) {
           setCartItems([]);
           setTotalUnits(0);
           setGrandTotal(0);

@@ -12,11 +12,6 @@ import type { ShippingQuoteResponse } from '../../types/shipping';
 import type { CartItemResponse } from '../../types/cart';
 import './CheckoutForm.scss';
 
-interface ProfileValues {
-  full_name?: string;
-  phone?: string;
-}
-
 const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'MERCADO_PAGO', label: 'Mercado Pago' },
   { value: 'TRANSFERENCIA', label: 'Transferencia bancaria' },
@@ -38,11 +33,10 @@ const CheckoutForm = () => {
   const { cartItems, grandTotal, loading: cartLoading, clearCart } = useCart();
   const { user, profile } = useAuth();
   const items: CartItemResponse[] = cartItems;
-  const profileValues = profile as ProfileValues | null;
 
-  const [customerName, setCustomerName] = useState(profileValues?.full_name ?? user?.nombre ?? '');
-  const [customerEmail, setCustomerEmail] = useState(user?.email ?? '');
-  const [customerPhone, setCustomerPhone] = useState(profileValues?.phone ?? '');
+  const [customerName, setCustomerName] = useState(profile?.userName ?? user?.userName ?? '');
+  const [customerEmail, setCustomerEmail] = useState(user?.userEmail ?? '');
+  const [customerPhone, setCustomerPhone] = useState(profile?.userPhone ?? user?.userPhone ?? '');
   const [isPickup, setIsPickup] = useState(true);
   const [provincias, setProvincias] = useState<GeoRefOption[]>([]);
   const [localidades, setLocalidades] = useState<GeoRefOption[]>([]);

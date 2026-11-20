@@ -1,22 +1,37 @@
 import type { ReactNode } from 'react';
-import { createContext, useState, useEffect } from 'react';
-import type { AuthResponse, AuthState, LoginCredentials, User } from '../types/auth';
-import { apiRequest, getStoredToken, setStoredToken } from '../services/api';
+import { createContext, useEffect, useState } from 'react';
+import type {
+  AuthResponse,
+  AuthState,
+  LoginCredentials,
+  RegisterRequest,
+  UserResponse,
+  UserRole,
+} from '../types/auth';
+import {
+  apiRequest,
+  clearStoredTokens,
+  getStoredRefreshToken,
+  getStoredToken,
+  setStoredRefreshToken,
+  setStoredToken,
+} from '../services/api';
+
+type AuthResult<T> = { data: T | null; error: Error | null };
+type ProfileUpdates = Partial<Pick<UserResponse, 'userName' | 'userPhone' | 'taxIdType' | 'taxIdNumber'>>;
 
 interface AuthContextValue extends AuthState {
-  profile: Record<string, unknown> | null;
-  role: string | null;
+  profile: UserResponse | null;
+  role: UserRole | null;
   isAdmin: boolean;
   isCustomer: boolean;
   isWholesaler: boolean;
-  isSuperAdmin: boolean;
-  login: (credentials: LoginCredentials) => Promise<{ data: AuthResponse | null; error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ data: AuthResponse | null; error: Error | null }>;
-  logout: () => void;
-  signOut: () => void;
-  signUp: (email: string, password: string, metadata?: Record<string, unknown>) => Promise<{ data: unknown | null; error: Error | null }>;
-  signInWithGoogle: () => Promise<{ data: unknown | null; error: Error | null }>;
-  updateProfile: (updates: Record<string, unknown>) => Promise<{ data: unknown | null; error: Error | null }>;
+  login: (credentials: LoginCredentials) => Promise<AuthResult<AuthResponse>>;
+  signIn: (email: string, password: string) => Promise<AuthResult<AuthResponse>>;
+  logout: () => Promise<void>;
+  signOut: () => Promise<void>;
+  register: (request: RegisterRequest) => Promise<AuthResult<UserResponse>>;
+  updateProfile: (updates: ProfileUpdates) => Promise<AuthResult<UserResponse>>;
 }
 
 const initialAuthState: AuthState = {
@@ -28,121 +43,128 @@ const initialAuthState: AuthState = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const getError = (error: unknown, fallback: string): Error =>
+  error instanceof Error ? error : new Error(fallback);
+
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState>(initialAuthState);
-  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [profile, setProfile] = useState<UserResponse | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   const clearSession = () => {
     setAuthState({ ...initialAuthState, isLoading: false });
     setProfile(null);
     setRole(null);
-    setStoredToken(null);
+    clearStoredTokens();
   };
 
   useEffect(() => {
     const restoreSession = async () => {
       try {
-        const response = await apiRequest<AuthResponse>('/auth/me');
+        const user = await apiRequest<UserResponse>('/auth/me');
         setAuthState({
-          user: response.user,
+          user,
           token: getStoredToken(),
           isAuthenticated: true,
           isLoading: false,
         });
-        setProfile(response.user as Record<string, unknown>);
-        setRole((response.user as User).rol ?? null);
+        setProfile(user);
+        setRole(user.userRole);
       } catch (error) {
         console.error('Error validating session:', error);
         clearSession();
       }
     };
 
-    const token = getStoredToken();
-    if (token) {
-      restoreSession();
+    if (getStoredToken()) {
+      void restoreSession();
     } else {
       setAuthState({ ...initialAuthState, isLoading: false });
     }
   }, []);
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (credentials: LoginCredentials): Promise<AuthResult<AuthResponse>> => {
     try {
       const data = await apiRequest<AuthResponse>('/auth/login', {
         method: 'POST',
         body: credentials,
       });
 
-      setStoredToken(data.token);
+      setStoredToken(data.accessToken);
+      setStoredRefreshToken(data.refreshToken);
       setAuthState({
         user: data.user,
-        token: data.token,
+        token: data.accessToken,
         isAuthenticated: true,
         isLoading: false,
       });
-      setProfile(data.user as Record<string, unknown>);
-      setRole(data.user.rol ?? null);
+      setProfile(data.user);
+      setRole(data.user.userRole);
 
       return { data, error: null };
     } catch (error) {
-      return { data: null, error: error instanceof Error ? error : new Error('Error de autenticación') };
+      return { data: null, error: getError(error, 'Error de autenticación') };
     }
   };
 
-  const logout = () => {
-    clearSession();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/iniciar_sesion';
-    }
-  };
+  const signIn = (email: string, password: string) => login({ email, password });
 
-  const signUp = async (email: string, password: string, metadata: Record<string, unknown> = {}) => {
+  const logout = async (): Promise<void> => {
+    const refreshToken = getStoredRefreshToken();
     try {
-      const data = await apiRequest('/auth/signup', {
+      if (refreshToken) {
+        await apiRequest<void>('/auth/logout', {
+          method: 'POST',
+          body: { refreshToken },
+        });
+      }
+    } finally {
+      clearSession();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/iniciar_sesion';
+      }
+    }
+  };
+
+  const register = async (request: RegisterRequest): Promise<AuthResult<UserResponse>> => {
+    try {
+      const data = await apiRequest<UserResponse>('/auth/register', {
         method: 'POST',
-        body: { email, password, metadata },
+        body: request,
       });
       return { data, error: null };
     } catch (error) {
-      return { data: null, error: error instanceof Error ? error : new Error('Error en registro') };
+      return { data: null, error: getError(error, 'Error en registro') };
     }
   };
 
-  const signInWithGoogle = async () => {
-    try {
-      const data = await apiRequest('/auth/oauth/google', {
-        method: 'GET',
-      });
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error: error instanceof Error ? error : new Error('Error OAuth') };
-    }
-  };
-
-  const updateProfile = async (updates: Record<string, unknown>) => {
+  const updateProfile = async (updates: ProfileUpdates): Promise<AuthResult<UserResponse>> => {
     if (!authState.user) {
       return { data: null, error: new Error('No hay usuario autenticado') };
     }
 
     try {
-      const data = await apiRequest(`/users/${encodeURIComponent(authState.user.id)}/profile`, {
-        method: 'PATCH',
-        body: updates,
+      const data = await apiRequest<UserResponse>(`/users/${encodeURIComponent(authState.user.userId)}`, {
+        method: 'PUT',
+        body: {
+          name: updates.userName ?? authState.user.userName,
+          phone: updates.userPhone ?? authState.user.userPhone,
+          taxIdType: updates.taxIdType ?? authState.user.taxIdType,
+          taxIdNumber: updates.taxIdNumber ?? authState.user.taxIdNumber,
+        },
       });
-      setProfile(data as Record<string, unknown>);
-      setRole((data as { roles?: { name?: string } }).roles?.name ?? null);
+      setAuthState((current) => ({ ...current, user: data }));
+      setProfile(data);
+      setRole(data.userRole);
       return { data, error: null };
     } catch (error) {
-      return { data: null, error: error instanceof Error ? error : new Error('Error actualizando perfil') };
+      return { data: null, error: getError(error, 'Error actualizando perfil') };
     }
   };
 
-  const isAdmin = ['admin', 'superadmin'].includes(role ?? '');
-  const isCustomer = role === 'customer';
-  const isWholesaler = role === 'wholesaler';
-  const isSuperAdmin = role === 'superadmin';
-
-  const signIn = login;
+  const isAdmin = ['ADMIN', 'OPERATOR'].includes(role ?? '');
+  const isCustomer = role === 'CUSTOMER';
+  const isWholesaler = role === 'WHOLESALER';
   const signOut = logout;
 
   const value: AuthContextValue = {
@@ -155,13 +177,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     isAdmin,
     isCustomer,
     isWholesaler,
-    isSuperAdmin,
     login,
     signIn,
-    signOut,
     logout,
-    signUp,
-    signInWithGoogle,
+    signOut,
+    register,
     updateProfile,
   };
 

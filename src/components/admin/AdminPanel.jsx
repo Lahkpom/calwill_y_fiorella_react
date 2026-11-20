@@ -3,7 +3,7 @@ import useAuth from '../../hooks/useAuth';
 import AdminProducts from './AdminProducts';
 
 const AdminPanel = () => {
-    const { user, profile, role, signOut } = useAuth();
+    const { user, role, signOut } = useAuth();
     const [activeSection, setActiveSection] = useState(null);
 
     return (
@@ -19,14 +19,9 @@ const AdminPanel = () => {
                         <button className="btn btn-outline-primary">
                             Ver Ventas
                         </button>
-                        {(role === 'admin' || role === 'superadmin') && (
+                        {(role === 'ADMIN' || role === 'OPERATOR') && (
                             <button className="btn btn-outline-success">
                                 Crear Usuario Mayorista
-                            </button>
-                        )}
-                        {role === 'superadmin' && (
-                            <button className="btn btn-outline-warning">
-                                Crear Admin
                             </button>
                         )}
                         <button 
@@ -47,12 +42,12 @@ const AdminPanel = () => {
                                         <h5>Información del Usuario</h5>
                                     </div>
                                     <div className="card-body">
-                                        <p><strong>Email:</strong> {user?.email}</p>
-                                        <p><strong>Nombre:</strong> {profile?.full_name}</p>
+                                        <p><strong>Email:</strong> {user?.userEmail}</p>
+                                        <p><strong>Nombre:</strong> {user?.userName}</p>
                                         <p><strong>Rol:</strong> <span className="badge bg-primary">{role}</span></p>
-                                        <p><strong>Teléfono:</strong> {profile?.phone || 'No especificado'}</p>
-                                        {profile?.company_name && (
-                                            <p><strong>Empresa:</strong> {profile.company_name}</p>
+                                        <p><strong>Teléfono:</strong> {user?.userPhone || 'No especificado'}</p>
+                                        {user?.companyName && (
+                                            <p><strong>Empresa:</strong> {user.companyName}</p>
                                         )}
                                     </div>
                                 </div>
@@ -60,21 +55,11 @@ const AdminPanel = () => {
                                 <div className="alert alert-info">
                                     <h5>Acciones disponibles según tu rol:</h5>
                                     <ul>
-                                        {role === 'superadmin' && (
-                                            <>
-                                                <li>✅ Crear y gestionar admins</li>
-                                                <li>✅ Crear usuarios mayoristas</li>
-                                                <li>✅ Gestionar productos y stock</li>
-                                                <li>✅ Ver todas las ventas</li>
-                                                <li>✅ Acceso total al sistema</li>
-                                            </>
-                                        )}
-                                        {role === 'admin' && (
+                                        {(role === 'ADMIN' || role === 'OPERATOR') && (
                                             <>
                                                 <li>✅ Crear usuarios mayoristas</li>
                                                 <li>✅ Gestionar productos y stock</li>
                                                 <li>✅ Ver todas las ventas</li>
-                                                <li>❌ No puede crear otros admins</li>
                                             </>
                                         )}
                                     </ul>

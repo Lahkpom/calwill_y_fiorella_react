@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { MainDataProvider } from './contexts/MainDataContext.jsx';
 import { CartProvider } from './contexts/CartContext';
-import router from './router/Router.jsx';
+import router from './router/Router';
 import './index.scss';
 
 createRoot(document.getElementById('root')).render(
