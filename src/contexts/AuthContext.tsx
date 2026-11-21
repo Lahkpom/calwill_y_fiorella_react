@@ -3,6 +3,7 @@ import { createContext, useEffect, useState } from 'react';
 import type {
   AuthResponse,
   AuthState,
+  ChangePasswordRequest,
   LoginCredentials,
   RegisterRequest,
   UserResponse,
@@ -32,6 +33,7 @@ interface AuthContextValue extends AuthState {
   signOut: () => Promise<void>;
   register: (request: RegisterRequest) => Promise<AuthResult<UserResponse>>;
   updateProfile: (updates: ProfileUpdates) => Promise<AuthResult<UserResponse>>;
+  changePassword: (payload: ChangePasswordRequest) => Promise<AuthResult<UserResponse>>;
 }
 
 const initialAuthState: AuthState = {
@@ -148,9 +150,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         method: 'PUT',
         body: {
           name: updates.userName ?? authState.user.userName,
-          phone: updates.userPhone ?? authState.user.userPhone,
-          taxIdType: updates.taxIdType ?? authState.user.taxIdType,
-          taxIdNumber: updates.taxIdNumber ?? authState.user.taxIdNumber,
+          phone: updates.userPhone === undefined ? authState.user.userPhone : updates.userPhone || null,
+          taxIdType: updates.taxIdType === undefined ? authState.user.taxIdType : updates.taxIdType || null,
+          taxIdNumber: updates.taxIdNumber === undefined ? authState.user.taxIdNumber : updates.taxIdNumber || null,
         },
       });
       setAuthState((current) => ({ ...current, user: data }));
@@ -159,6 +161,28 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { data, error: null };
     } catch (error) {
       return { data: null, error: getError(error, 'Error actualizando perfil') };
+    }
+  };
+
+  const changePassword = async (payload: ChangePasswordRequest): Promise<AuthResult<UserResponse>> => {
+    if (!authState.user) {
+      return { data: null, error: new Error('No hay usuario autenticado') };
+    }
+
+    try {
+      const data = await apiRequest<UserResponse>(
+        `/users/${encodeURIComponent(authState.user.userId)}/password`,
+        {
+          method: 'PATCH',
+          body: payload,
+        },
+      );
+      setAuthState((current) => ({ ...current, user: data }));
+      setProfile(data);
+      setRole(data.userRole);
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: getError(error, 'Error actualizando la contraseña') };
     }
   };
 
@@ -183,6 +207,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     signOut,
     register,
     updateProfile,
+    changePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
