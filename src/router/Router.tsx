@@ -13,7 +13,11 @@ import Signup from '../pages/login/Signup';
 
 import Error404 from '../pages/errors/Error404.jsx';
 import ProtectedRoute from '../components/ProtectedRoute';
-import AdminHome from '../pages/admin/AdminHome.jsx';
+import AdminLayout from '../components/admin/AdminLayout';
+import AdminHome from '../pages/admin/AdminHome';
+import AdminProducts from '../pages/admin/AdminProducts';
+import AdminVariants from '../pages/admin/AdminVariants';
+import AdminColors from '../pages/admin/AdminColors';
 
 import Cart from '../pages/user/Cart';
 import Checkout from '../pages/Checkout';
@@ -70,10 +74,17 @@ const router = createBrowserRouter([
         path: 'mis_pedidos',
         element: <ProtectedRoute><MyOrdersPage /></ProtectedRoute>,
       },
-      {
-        path: 'admin',
-        element: <ProtectedRoute roles={['ADMIN', 'OPERATOR']}><AdminHome /></ProtectedRoute>,
-      },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <ProtectedRoute roles={['ADMIN', 'OPERATOR']}><AdminLayout /></ProtectedRoute>,
+    errorElement: <Error404 />,
+    children: [
+      { index: true, element: <AdminHome /> },
+      { path: 'productos', element: <AdminProducts /> },
+      { path: 'variantes', element: <AdminVariants /> },
+      { path: 'colores', element: <AdminColors /> },
     ],
   },
 ]);

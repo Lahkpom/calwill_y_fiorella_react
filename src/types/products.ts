@@ -1,5 +1,93 @@
 import type { ProductCategory, TargetGender } from '../constants/products';
 
+export type RowStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED';
+
+export interface ColorResponse {
+  id: number;
+  name: string;
+  desc: string;
+  code: string;
+  rowStatus: RowStatus;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface ColorRequest {
+  name: string;
+  desc: string;
+  code: string;
+}
+
+export interface AdminProductResponse {
+  id: string;
+  category: ProductCategory;
+  targetGender: TargetGender;
+  name: string;
+  shortDesc: string;
+  longDesc: string;
+  status: RowStatus;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface ProductOption {
+  id: string;
+  name: string;
+  targetGender: TargetGender;
+}
+
+export interface AdminProductRequest {
+  targetGender: TargetGender;
+  name: string;
+  shortDesc: string;
+  longDesc: string;
+}
+
+export interface AdminVariantResponse {
+  id: number;
+  productId: string;
+  productName: string;
+  colorId: number;
+  colorName: string;
+  colorCode: string;
+  size: NumericSize;
+  desc: string;
+  sku: string;
+  price: number;
+  stock: number;
+  rowStatus: RowStatus;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface VariantCreateRequest {
+  productId: string;
+  colorId: number;
+  size: NumericSize;
+  desc: string;
+  sku: string;
+  price: number;
+  stock: number;
+}
+
+export interface VariantUpdateRequest {
+  colorId: number;
+  size: NumericSize;
+  desc: string;
+  sku: string;
+  price: number;
+  stock: number;
+}
+
+export interface AdminVariantSearchFilters {
+  productId?: string;
+  colorId?: number;
+  size?: NumericSize;
+  rowStatus?: Exclude<RowStatus, 'DELETED'>;
+  search?: string;
+  page?: number;
+}
+
 export interface ProductCatalogImage {
   colorId: number | null;
   colorName: string | null;

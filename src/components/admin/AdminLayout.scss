@@ -1,0 +1,159 @@
+.admin-layout {
+  min-height: 100vh;
+  background: #f5f6f8;
+  color: #242a31;
+}
+
+.admin-layout__sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 20;
+  display: flex;
+  width: 270px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 1rem;
+  background: #202b3c;
+  color: #fff;
+}
+
+.admin-layout__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 2rem;
+}
+
+.admin-layout__brand-mark {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: #c58b54;
+  color: #fff;
+  font-weight: 700;
+}
+
+.admin-layout__brand strong,
+.admin-layout__role {
+  display: block;
+}
+
+.admin-layout__role {
+  margin-top: 0.2rem;
+  color: #b6c0cd;
+  font-size: 0.75rem;
+}
+
+.admin-layout__nav {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-layout__link,
+.admin-layout__action {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  background: transparent;
+  color: #e6ebf1;
+  text-align: left;
+  text-decoration: none;
+}
+
+.admin-layout__link:hover,
+.admin-layout__link.is-active {
+  background: #34445a;
+  color: #fff;
+}
+
+.admin-layout__link.is-disabled {
+  color: #9da8b6;
+  cursor: not-allowed;
+}
+
+.admin-layout__upcoming-title {
+  margin: 1.7rem 0 0.6rem 0.8rem;
+  color: #aeb8c5;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.admin-layout__coming-soon {
+  font-size: 0.65rem;
+}
+
+.admin-layout__actions {
+  display: grid;
+  gap: 0.35rem;
+  border-top: 1px solid #3b4859;
+  padding-top: 1rem;
+}
+
+.admin-layout__action:hover {
+  background: #34445a;
+}
+
+.admin-layout__action.is-logout {
+  color: #ffc2bf;
+}
+
+.admin-layout__main {
+  min-height: 100vh;
+  margin-left: 270px;
+  padding: 2rem;
+}
+
+.admin-layout__menu-toggle,
+.admin-layout__backdrop {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .admin-layout__sidebar {
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+  }
+
+  .admin-layout__sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .admin-layout__main {
+    margin-left: 0;
+    padding: 4.5rem 1rem 1.5rem;
+  }
+
+  .admin-layout__menu-toggle {
+    position: fixed;
+    z-index: 30;
+    top: 0.8rem;
+    left: 0.8rem;
+    display: block;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: #202b3c;
+    color: #fff;
+    font-size: 1.25rem;
+  }
+
+  .admin-layout__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: block;
+    border: 0;
+    background: rgb(0 0 0 / 45%);
+  }
+}
